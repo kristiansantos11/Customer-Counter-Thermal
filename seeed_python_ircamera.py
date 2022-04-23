@@ -468,15 +468,16 @@ def counter():
         if(((temperature_print.temperature > fever) and (enterDistance <= required_distance)) or (count.count >= 15)):
             ledWarn.on()
             buzzer.on()
+            buzzerOff = False
+            previousBuzzerOff = False
         else:
             ledWarn.off()
             buzzerOff = True
-            previousBuzzerOff = False
+            if buzzerOff and not previousBuzzerOff:
+                buzzer.off()
+                previousBuzzerOff = True
 
-        if buzzerOff and not previousBuzzerOff:
-            buzzer.off()
-            buzzerOff = False
-            previousBuzzerOff = True
+
 
         sleep(0.2)
 
