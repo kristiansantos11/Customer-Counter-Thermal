@@ -91,9 +91,9 @@ hetaData = []
 lock = threading.Lock()
 minHue = 180
 maxHue = 360
+required_distance = 0.25
 count = Count()
 temperature_print = TemperaturePrint()
-distance = Distance()
 reading = True
 offset_temp = 1.5
 fever = 37
@@ -330,6 +330,7 @@ class painter(QGraphicsView):
         hetDiff = maxHet - minHet
         bastNum = round(minHet)
         interval = round(hetDiff / 5)
+
         """
         for i in range(5):
             hue = constrain(mapValue((bastNum + (i * interval)), minHet, maxHet, minHue, maxHue), minHue, maxHue)
@@ -338,8 +339,9 @@ class painter(QGraphicsView):
             p.setFont(font)
             p.drawText(i * self.textInterval, self.fontSize + 3, str(bastNum + (i * interval)) + "°")
         """
-        if(sensorEnter.value < 0.15):
-            if(temperature_print.temperature > fever):
+        cneter = round(frame[self.centerIndex], 1) + offset_temp
+        if(sensorEnter.value < required_distance):
+            if(cneter > fever):
                 bgcolor = Qt.red
                 textDisplay = "Entrance denied."
             else:
@@ -361,7 +363,6 @@ class painter(QGraphicsView):
         
         self.hetTextItem.setPixmap(self.hetTextBuffer)
         # draw center het text
-        cneter = round(frame[self.centerIndex], 1) + offset_temp
         centerText = "<font color=white>%s</font>"
         self.centerTextItem.setFont(font)
         self.centerTextItem.setHtml(centerText % (str(cneter) + "°"))
@@ -401,42 +402,75 @@ def read_temperature():
         sleep(0.2)
 
 def counter():
-    global distance
     exitDetected = False
     enterDetected = False
+    hasFever = False
+    beepEnterActive = False
+    beepExitActive = False
+    countUp = False
+    counterEnter = 0
+    counterExit = 0
+    delay = 700
     
     while reading:
         exitDistance = sensorExit.value
         enterDistance = sensorEnter.value
         print("SensorExit: "  + '{:1.2f}'.format(exitDistance) + " cm")
         print("SensorEnter: "  + '{:1.2f}'.format(enterDistance) + " cm")
-        if(enterDistance <= 0.15):
+        if(enterDistance <= required_distance):
             if(temperature_print.temperature > fever):
                 enterDetected = False
-            else:
+                hasFever = True
+            elif(temperature_print.temperature < fever) and (temperature_print.temperature > 35.0):
                 enterDetected = True
+                countUp = True
+                #beep happens here
+                beepEnterActive = True
+            else:
+                enterDetected = False
+
+        if beepEnterActive and counterEnter < delay:
+            counterEnter += 1
+            buzzer.on()
+        else:
+            buzzer.off()
             
-        if(enterDetected and (enterDistance > 0.15)):
+        if(enterDetected and (enterDistance > required_distance) and countUp):
             enterDetected = False
-            count.increment()
-            buzzer.beep(on_time=1,n=1)
+            beepEnterActive = False
+            countUp = False
+            counterEnter = 0
+            if not (hasFever):
+                count.increment()
+                #buzzer.beep(on_time=2,n=1)
+            hasFever = False
         
         if(exitDistance <= 0.15):
             exitDetected = True
-        if(exitDetected and (exitDistance > 0.15)):
+            beepExitActive = True
+
+        if(beepExitActive and counterExit < delay):
+            counterExit += 1
+            buzzer.on()
+        else:
+            buzzer.off()
+
+        if(exitDetected and (exitDistance > required_distance)):
             exitDetected = False
+            beepExitActive = False
+            counterExit = 0
             count.decrement()
-            buzzer.beep(on_time=1,n=1)
+            #buzzer.beep(on_time=2,n=1)
         
-        if((enterDistance <= 0.15) or (exitDistance <= 0.15)):
-            if((enterDistance <= 0.15) and temperature_print.temperature > fever):
+        if((enterDistance <= required_distance) or (exitDistance <= required_distance)):
+            if((enterDistance <= required_distance) and temperature_print.temperature > fever):
                 ledEnter.off()
             else:
                 ledEnter.on()
         else:
             ledEnter.off()
 
-        if(((temperature_print.temperature > fever) and (enterDistance <= 0.15)) or (count.count >= 15)):
+        if(((temperature_print.temperature > fever) and (enterDistance <= required_distance)) or (count.count >= 15)):
             ledWarn.on()
             buzzer.on()
         else:
@@ -452,11 +486,9 @@ signal(SIGHUP, safe_exit)
 
 try:
     thermal_imaging = Thread(target=run, daemon=True)
-    #indicatorWindow = Thread(target=indicator_window, daemon=True)
     reader = Thread(target=read_temperature, daemon=True)
     counter_check = Thread(target=counter, daemon=True)
     shutdown_btn = Button(6, hold_time=2)
-    #indicatorWindow.start()
     thermal_imaging.start()
     reader.start()
     counter_check.start()
