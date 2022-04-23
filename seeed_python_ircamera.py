@@ -406,9 +406,8 @@ def counter():
     enterDetected = False
     hasFever = False
     beepActive = False
+    previousBeepActive = False
     countUp = False
-    counterBeep = 0
-    delay = 100
     
     while reading:
         exitDistance = sensorExit.value
@@ -432,8 +431,8 @@ def counter():
         if(enterDetected and (enterDistance > required_distance) and countUp):
             enterDetected = False
             beepActive = False
+            previousBeepActive = False
             countUp = False
-            counterBeep = 0
             if not (hasFever):
                 count.increment()
                 #buzzer.beep(on_time=2,n=1)
@@ -442,20 +441,18 @@ def counter():
         #Exit Logic
         if(exitDistance <= 0.15):
             exitDetected = True
-            beepExitActive = True
+            beepActive = True
 
         if(exitDetected and (exitDistance > required_distance)):
             exitDetected = False
             beepActive = False
-            counterBeep = 0
+            previousBeepActive = False
             count.decrement()
             #buzzer.beep(on_time=2,n=1)
 
-        if beepActive and counterBeep < delay:
-            counterBeep += 1
-            buzzer.on()
-        else:
-            buzzer.off()
+        if beepActive and not previousBeepActive:
+            buzzer.beep(on_time=2,n=1)
+            previousBeepActive = True
         
         if((enterDistance <= required_distance) or (exitDistance <= required_distance)):
             if((enterDistance <= required_distance) and temperature_print.temperature > fever):
