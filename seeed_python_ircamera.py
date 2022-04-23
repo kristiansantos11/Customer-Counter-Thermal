@@ -344,9 +344,12 @@ class painter(QGraphicsView):
             if(cneter > fever):
                 bgcolor = Qt.red
                 textDisplay = "Entrance denied."
-            else:
+            elif(cneter < fever) and (cneter > 35):
                 bgcolor = Qt.green
                 textDisplay = "Please enter."
+            else:
+                bgcolor = Qt.white
+                textDisplay = "Noo ay itapat sa cross"
         else:
             bgcolor = Qt.white
             textDisplay = "Go near entrance"
