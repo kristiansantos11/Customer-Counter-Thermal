@@ -405,18 +405,18 @@ def counter():
     exitDetected = False
     enterDetected = False
     hasFever = False
-    beepEnterActive = False
-    beepExitActive = False
+    beepActive = False
     countUp = False
-    counterEnter = 0
-    counterExit = 0
-    delay = 2000
+    counterBeep = 0
+    delay = 100
     
     while reading:
         exitDistance = sensorExit.value
         enterDistance = sensorEnter.value
         print("SensorExit: "  + '{:1.2f}'.format(exitDistance) + " cm")
         print("SensorEnter: "  + '{:1.2f}'.format(enterDistance) + " cm")
+
+        #Entrance Logic
         if(enterDistance <= required_distance):
             if(temperature_print.temperature > fever):
                 enterDetected = False
@@ -425,42 +425,37 @@ def counter():
                 enterDetected = True
                 countUp = True
                 #beep happens here
-                beepEnterActive = True
+                beepActive = True
             else:
                 enterDetected = False
-
-        if beepEnterActive and counterEnter < delay:
-            counterEnter += 1
-            buzzer.on()
-        else:
-            buzzer.off()
             
         if(enterDetected and (enterDistance > required_distance) and countUp):
             enterDetected = False
-            beepEnterActive = False
+            beepActive = False
             countUp = False
-            counterEnter = 0
+            counterBeep = 0
             if not (hasFever):
                 count.increment()
                 #buzzer.beep(on_time=2,n=1)
             hasFever = False
-        
+
+        #Exit Logic
         if(exitDistance <= 0.15):
             exitDetected = True
             beepExitActive = True
 
-        if(beepExitActive and counterExit < delay):
-            counterExit += 1
+        if(exitDetected and (exitDistance > required_distance)):
+            exitDetected = False
+            beepActive = False
+            counterBeep = 0
+            count.decrement()
+            #buzzer.beep(on_time=2,n=1)
+
+        if beepActive and counterBeep < delay:
+            counterBeep += 1
             buzzer.on()
         else:
             buzzer.off()
-
-        if(exitDetected and (exitDistance > required_distance)):
-            exitDetected = False
-            beepExitActive = False
-            counterExit = 0
-            count.decrement()
-            #buzzer.beep(on_time=2,n=1)
         
         if((enterDistance <= required_distance) or (exitDistance <= required_distance)):
             if((enterDistance <= required_distance) and temperature_print.temperature > fever):
