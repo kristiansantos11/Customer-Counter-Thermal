@@ -466,6 +466,7 @@ def counter():
             ledWarn.on()
             buzzer.on()
             buzzerOff = False
+            previousBuzzerOff = False
         else:
             ledWarn.off()
             buzzerOff = True
