@@ -410,7 +410,7 @@ def counter():
     countUp = False
     counterEnter = 0
     counterExit = 0
-    delay = 700
+    delay = 2000
     
     while reading:
         exitDistance = sensorExit.value
@@ -510,4 +510,3 @@ finally:
     sensorExit.close()
     ledWarn.close()
     ledEnter.close()
-    
