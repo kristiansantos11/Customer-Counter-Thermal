@@ -96,7 +96,7 @@ count = Count()
 temperature_print = TemperaturePrint()
 reading = True
 offset_temp = 1.5
-fever = 36
+fever = 38
 
 class DataReader(QThread):
     drawRequire = pyqtSignal()
@@ -451,7 +451,7 @@ def counter():
             count.decrement()
 
         if beepActive and not previousBeepActive:
-            buzzer.beep(on_time=1,n=1)
+            buzzer.beep(on_time=0.3,n=1)
             previousBeepActive = True
         
         if((enterDistance <= required_distance) or (exitDistance <= required_distance)):
