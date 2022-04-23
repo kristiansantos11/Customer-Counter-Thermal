@@ -467,7 +467,6 @@ def counter():
             buzzer.on()
         else:
             ledWarn.off()
-            buzzer.off()
         sleep(0.2)
 
 def shutdown():
