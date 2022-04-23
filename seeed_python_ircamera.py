@@ -96,7 +96,7 @@ count = Count()
 temperature_print = TemperaturePrint()
 reading = True
 offset_temp = 1.5
-fever = 38
+fever = 36
 
 class DataReader(QThread):
     drawRequire = pyqtSignal()
@@ -469,9 +469,11 @@ def counter():
         else:
             ledWarn.off()
             buzzerOff = True
-            if buzzerOff and not previousBuzzerOff:
-                buzzer.off()
-                previousBuzzerOff = True
+
+        if buzzerOff and not previousBuzzerOff:
+            buzzer.off()
+            previousBuzzerOff = True
+
         sleep(0.2)
 
 def shutdown():
