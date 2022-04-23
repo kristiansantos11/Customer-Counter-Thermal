@@ -96,7 +96,7 @@ count = Count()
 temperature_print = TemperaturePrint()
 reading = True
 offset_temp = 1.5
-fever = 36
+fever = 37.2
 
 class DataReader(QThread):
     drawRequire = pyqtSignal()
