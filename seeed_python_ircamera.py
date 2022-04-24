@@ -89,14 +89,19 @@ class Count():
 
 hetaData = []
 lock = threading.Lock()
+
+# Settings
 minHue = 180
 maxHue = 360
 required_distance = 0.25
-count = Count()
-temperature_print = TemperaturePrint()
 reading = True
 offset_temp = 1.5
 fever = 37.2
+normal_temp = 35
+
+# Data class initialize
+count = Count()
+temperature_print = TemperaturePrint()
 
 class DataReader(QThread):
     drawRequire = pyqtSignal()
@@ -344,7 +349,7 @@ class painter(QGraphicsView):
             if(cneter > fever):
                 bgcolor = Qt.red
                 textDisplay = "Entrance denied."
-            elif(cneter < fever) and (cneter > 35):
+            elif(cneter < fever) and (cneter > normal_temp):
                 bgcolor = Qt.green
                 textDisplay = "Please enter."
             else:
@@ -413,6 +418,8 @@ def counter():
     countUp = False
     buzzerOff = False
     previousBuzzerOff = False
+    beepFever = False
+    previousBeepFever = False
     
     while reading:
         exitDistance = sensorExit.value
@@ -420,12 +427,12 @@ def counter():
         print("SensorExit: "  + '{:1.2f}'.format(exitDistance) + " cm")
         print("SensorEnter: "  + '{:1.2f}'.format(enterDistance) + " cm")
 
-        #Entrance Logic
+        # Entrance Logic
         if(enterDistance <= required_distance):
             if(temperature_print.temperature > fever):
                 enterDetected = False
                 hasFever = True
-            elif(temperature_print.temperature < fever) and (temperature_print.temperature > 35.0):
+            elif(temperature_print.temperature < fever) and (temperature_print.temperature > normal_temp):
                 enterDetected = True
                 countUp = True
                 #beep happens here
@@ -442,7 +449,7 @@ def counter():
                 count.increment()
             hasFever = False
 
-        #Exit Logic
+        # Exit Logic
         if(exitDistance <= 0.15):
             exitDetected = True
             beepActive = True
@@ -450,24 +457,30 @@ def counter():
         if(exitDetected and (exitDistance > required_distance)):
             exitDetected = False
             beepActive = False
+            beepFever = False
             previousBeepActive = False
             count.decrement()
 
+        # Beep Logic
         if beepActive and not previousBeepActive:
             buzzer.beep(on_time=0.3,n=1)
             previousBeepActive = True
-        
+
+        # Green LED Logic
         if((enterDistance <= required_distance) or (exitDistance <= required_distance)):
             if((enterDistance <= required_distance) and temperature_print.temperature > fever):
                 ledEnter.off()
-            else:
+            elif(enterDistance <= required_distance) and ((temperature_print.temperature < fever) and (temperature_print.temperature > normal_temp)):
                 ledEnter.on()
+            else:
+                ledEnter.off()
         else:
             ledEnter.off()
 
+        # What happens if fever is detected or count is more than 15
+        # Buzzer and LED Warn Logic
         if(((temperature_print.temperature > fever) and (enterDistance <= required_distance)) or (count.count >= 15)):
             ledWarn.on()
-            buzzer.on()
             buzzerOff = False
             previousBuzzerOff = False
         else:
@@ -477,7 +490,13 @@ def counter():
                 buzzer.off()
                 previousBuzzerOff = True
 
+        if((temperature_print.temperature > fever) and (enterDistance <= required_distance)):
+            beepFever = True
+            previousBeepFever = False
 
+        if beepFever and not previousBeepFever:
+            buzzer.beep(on_time=3, n=1)
+            previousBeepFever = True
 
         sleep(0.2)
 
