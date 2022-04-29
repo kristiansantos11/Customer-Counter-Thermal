@@ -85,10 +85,9 @@ class Count():
         self.count += 1
     
     def decrement(self):
+        self.count -= 1
         if self.count < 0:
             self.count = 0
-        else:
-            self.count -= 1
 
 hetaData = []
 lock = threading.Lock()
