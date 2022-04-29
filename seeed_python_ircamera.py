@@ -85,7 +85,10 @@ class Count():
         self.count += 1
     
     def decrement(self):
-        self.count -= 1
+        if self.count < 0:
+            self.count = 0
+        else:
+            self.count -= 1
 
 hetaData = []
 lock = threading.Lock()
@@ -93,11 +96,11 @@ lock = threading.Lock()
 # Settings
 minHue = 180
 maxHue = 360
-required_distance = 0.25
+required_distance = 0.45
 reading = True
-offset_temp = 1.5
-fever = 37.2
-normal_temp = 35
+offset_temp = 1.0
+fever = 38
+normal_temp = 35.0
 
 # Data class initialize
 count = Count()
@@ -438,19 +441,23 @@ def counter():
                 #beep happens here
                 beepActive = True
             else:
-                enterDetected = False
+                if(countUp):
+                    enterDetected = True
+                else:
+                    enterDetected = False
             
-        if(enterDetected and (enterDistance > required_distance) and countUp):
+        if(enterDetected and (enterDistance > required_distance)):
             enterDetected = False
             beepActive = False
             previousBeepActive = False
-            countUp = False
+            
             if not (hasFever):
                 count.increment()
+                countUp = False
             hasFever = False
 
         # Exit Logic
-        if(exitDistance <= 0.15):
+        if(exitDistance <= required_distance):
             exitDetected = True
             beepActive = True
 
@@ -481,6 +488,7 @@ def counter():
         # Buzzer and LED Warn Logic
         if(((temperature_print.temperature > fever) and (enterDistance <= required_distance)) or (count.count >= 15)):
             ledWarn.on()
+            buzzer.on()
             buzzerOff = False
             previousBuzzerOff = False
         else:
