@@ -100,7 +100,8 @@ required_distance = 0.45
 reading = True
 offset_temp = 1.5
 fever = 38.0
-normal_temp = 35.0
+# normal_temp = 35.0
+max_capacity = 10
 
 # Data class initialize
 count = Count()
@@ -352,12 +353,9 @@ class painter(QGraphicsView):
             if(cneter > fever):
                 bgcolor = Qt.red
                 textDisplay = "Entrance denied."
-            elif(cneter < fever) and (cneter > normal_temp):
+            elif(cneter < fever):
                 bgcolor = Qt.green
                 textDisplay = "Please enter."
-            else:
-                bgcolor = Qt.white
-                textDisplay = "Noo ay itapat sa cross"
         else:
             bgcolor = Qt.white
             textDisplay = "Go near entrance"
@@ -435,7 +433,7 @@ def counter():
             if(temperature_print.temperature > fever):
                 enterDetected = False
                 hasFever = True
-            elif(temperature_print.temperature < fever) and (temperature_print.temperature > normal_temp):
+            elif(temperature_print.temperature < fever):
                 enterDetected = True
                 countUp = True
                 #beep happens here
@@ -477,7 +475,7 @@ def counter():
         if((enterDistance <= required_distance) or (exitDistance <= required_distance)):
             if((enterDistance <= required_distance) and temperature_print.temperature > fever):
                 ledEnter.off()
-            elif(enterDistance <= required_distance) and ((temperature_print.temperature < fever) and (temperature_print.temperature > normal_temp)):
+            elif(enterDistance <= required_distance) and (temperature_print.temperature < fever):
                 ledEnter.on()
             else:
                 ledEnter.off()
@@ -486,7 +484,7 @@ def counter():
 
         # What happens if fever is detected or count is more than 15
         # Buzzer and LED Warn Logic
-        if(((temperature_print.temperature > fever) and (enterDistance <= required_distance)) or (count.count >= 15)):
+        if(((temperature_print.temperature > fever) and (enterDistance <= required_distance)) or (count.count >= max_capacity)):
             ledWarn.on()
             buzzer.on()
             buzzerOff = False
