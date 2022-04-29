@@ -98,8 +98,8 @@ minHue = 180
 maxHue = 360
 required_distance = 0.45
 reading = True
-offset_temp = 1.0
-fever = 38
+offset_temp = 1.5
+fever = 38.0
 normal_temp = 35.0
 
 # Data class initialize
