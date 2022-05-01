@@ -352,7 +352,7 @@ class painter(QGraphicsView):
             if(cneter > fever):
                 bgcolor = Qt.red
                 textDisplay = "Entrance denied."
-            elif(cneter < fever):
+            else:
                 bgcolor = Qt.green
                 textDisplay = "Please enter."
         else:
@@ -403,7 +403,7 @@ def run():
 def read_temperature():
     while reading:
         lcd.text("Counter: " + str(count.count), 1)
-        if(count.count >= 15):
+        if(count.count >= max_capacity):
             lcd.text("Already full!", 2)
         else:
             lcd.text("                ",2)
