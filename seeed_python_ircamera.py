@@ -386,9 +386,6 @@ class painter(QGraphicsView):
                 if self.timer_counter == 0:
                     self.temp_temperature = str(cneter) + "°"
                     self.timerStop = True
-                else:
-                    bgcolor = Qt.white
-                    textDisplay = "Timer must be 0"
             if self.timerStop:
                 # See if the temperature will allow the user to enter or not
                 if (cneter > fever):
@@ -397,6 +394,9 @@ class painter(QGraphicsView):
                 else:
                     bgcolor = Qt.green
                     textDisplay = "Please enter."
+            else:
+                bgcolor = Qt.white
+                textDisplay = "Timer must be 0"
 
         # Logic for printing the background and text
         p.fillRect(
