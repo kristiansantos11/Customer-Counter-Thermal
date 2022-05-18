@@ -371,6 +371,8 @@ class painter(QGraphicsView):
 
         # Check if there is someone entering
         if(sensorEnter.value >= required_distance):
+            bgcolor = Qt.white
+            textDisplay = "Go near entrance"
             self.start_timer = time()
             self.timerStop = False
             self.timer_counter = 3
@@ -385,17 +387,16 @@ class painter(QGraphicsView):
                     self.temp_temperature = str(cneter) + "°"
                     self.timerStop = True
 
-        # See if the temperature will allow the user to enter or not
-        if(sensorEnter.value < required_distance):
-            if(cneter > fever):
-                bgcolor = Qt.red
-                textDisplay = "Entrance denied."
-            else:
-                bgcolor = Qt.green
-                textDisplay = "Please enter."
-        else:
-            bgcolor = Qt.white
-            textDisplay = "Go near entrance"
+                    # See if the temperature will allow the user to enter or not
+                    if(cneter > fever):
+                        bgcolor = Qt.red
+                        textDisplay = "Entrance denied."
+                    else:
+                        bgcolor = Qt.green
+                        textDisplay = "Please enter."
+                else:
+                    bgcolor = Qt.white
+                    textDisplay = "Wait for timer to go 0"
 
         # Logic for printing the background and text
         p.fillRect(
