@@ -386,6 +386,7 @@ class painter(QGraphicsView):
                 if self.timer_counter == 0:
                     self.temp_temperature = str(cneter) + "°"
                     self.timerStop = True
+                    temperature_print.setTemp(cneter)
             if self.timerStop:
                 # See if the temperature will allow the user to enter or not
                 if (cneter > fever):
@@ -426,7 +427,7 @@ class painter(QGraphicsView):
         #print("picture->"+str(self.frameCount))
 
         # write in lcd
-        temperature_print.setTemp(cneter)
+        # temperature_print.setTemp(cneter)
     
 def run():
     global minHue
@@ -469,6 +470,8 @@ def counter():
     previousBuzzerOff = False
     beepFever = False
     previousBeepFever = False
+    beepExit = False
+    previousBeepExit = False
 
     start_time = time()
     timer_count = 3
@@ -484,6 +487,7 @@ def counter():
             start_time = time()
             timer_count = 3
             timerStop = False
+
         else:
             if((time() - start_time) >= 1) and not timerStop:
                 start_time = time()
@@ -492,81 +496,39 @@ def counter():
                     timerStop = True
 
         if timerStop:
-            # Entrance Logic
-            if(enterDistance <= required_distance):
-                if(temperature_print.temperature > fever):
-                    enterDetected = False
-                    hasFever = True
-                elif(temperature_print.temperature < fever):
-                    enterDetected = True
-                    countUp = True
-                    #beep happens here
-                    beepActive = True
-                else:
-                    if(countUp):
-                        enterDetected = True
-                    else:
-                        enterDetected = False
-
-            if(enterDetected and (enterDistance > required_distance)):
-                enterDetected = False
-                beepActive = False
-                previousBeepActive = False
-
-                if not (hasFever):
-                    count.increment()
-                    countUp = False
-                hasFever = False
-
-            # Exit Logic
-            if(exitDistance <= required_distance):
-                exitDetected = True
-                beepActive = True
-
-            if(exitDetected and (exitDistance > required_distance)):
-                exitDetected = False
-                beepActive = False
-                beepFever = False
-                previousBeepActive = False
-                count.decrement()
-
-            # Beep Logic
-            if beepActive and not previousBeepActive:
-                buzzer.beep(on_time=0.3,n=1)
-                previousBeepActive = True
-
-            # Green LED Logic
-            if((enterDistance <= required_distance) or (exitDistance <= required_distance)):
-                if((enterDistance <= required_distance) and temperature_print.temperature > fever):
-                    ledEnter.off()
-                elif(enterDistance <= required_distance) and (temperature_print.temperature < fever):
-                    ledEnter.on()
-                else:
-                    ledEnter.off()
-            else:
-                ledEnter.off()
-
-            # What happens if fever is detected or count is more than 15
-            # Buzzer and LED Warn Logic
-            if(((temperature_print.temperature > fever) and (enterDistance <= required_distance)) or (count.count >= max_capacity)):
+            if temperature_print.temperature > fever:
                 ledWarn.on()
                 buzzer.on()
-                buzzerOff = False
-                previousBuzzerOff = False
             else:
-                ledWarn.off()
-                buzzerOff = True
-                if buzzerOff and not previousBuzzerOff:
-                    buzzer.off()
-                    previousBuzzerOff = True
+                ledEnter.on()
+                beepActive = True
 
-            if((temperature_print.temperature > fever) and (enterDistance <= required_distance)):
-                beepFever = True
-                previousBeepFever = False
+            if not previousBeepActive and beepActive:
+                buzzer.beep(on_time=0.3, n=1)
+                count.increment()
+                previousBeepActive = True
+        else:
+            ledWarn.off()
+            beepActive = False
+            if not beepExit and not beepActive:
+                buzzer.off()
+            ledEnter.off()
 
-            if beepFever and not previousBeepFever:
-                buzzer.beep(on_time=3, n=1)
-                previousBeepFever = True
+
+        # Exit Logic
+        if (exitDistance <= required_distance):
+            exitDetected = True
+            beepExit = True
+
+        if not previousBeepExit and beepExit:
+            buzzer.beep(on_time = 0.3, n=1)
+            previousBeepExit = True
+
+        if (exitDetected and (exitDistance > required_distance)):
+            exitDetected = False
+            beepExit = False
+            previousBeepActive = False
+            count.decrement()
 
         sleep(0.2)
 
