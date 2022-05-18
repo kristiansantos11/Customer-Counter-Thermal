@@ -4,7 +4,7 @@ import seeed_mlx90640
 from rpi_lcd import LCD
 from gpiozero import DistanceSensor, LED, Buzzer, Button
 from threading import Thread
-from time import sleep
+from time import sleep, time
 from subprocess import check_call
 from signal import signal, SIGTERM, SIGHUP, pause
 from serial import Serial
@@ -68,8 +68,8 @@ class TemperaturePrint():
 
 class Distance():
     def __init__(self):
-        self.enterDistance = 20
-        self.exitDistance = 20
+        self.enterDistance = 50
+        self.exitDistance = 50
     
     def setEnterDistance(self, distance_enter):
         self.enterDistance = distance_enter
@@ -227,6 +227,7 @@ class painter(QGraphicsView):
     width = int (480 / narrowRatio)
     height = int(360 / narrowRatio)
     fontSize = int(30 / narrowRatio)
+    cneterFontSize = int(30 / narrowRatio) + 5
     anchorLineSize = int(100 / narrowRatio)
     ellipseRadius = int(8 / narrowRatio)
     textInterval = int(90 / narrowRatio)
@@ -237,6 +238,20 @@ class painter(QGraphicsView):
     baseZValue = 0
     textLineHeight = fontSize + 10
     blurRaduis = 50  # Smoother improvement
+
+    # Initially, timer counter must be 3
+    timer_counter = 3
+
+    # Initially, temp_temperature must be a space
+    # Also it MUST ALWAYS be a string
+    temp_temperature: str = " "
+
+    # Initialize timer stop flag
+    timerStop = False
+
+    # Initialize start_timer flag
+    start_timer = time()
+
     def __init__(self):
         super(painter, self).__init__()
         self.setFixedSize(self.width, self.height + self.textLineHeight)
@@ -244,11 +259,19 @@ class painter(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scene = QGraphicsScene()
         self.setScene(self.scene)
+
         # center het text item
         self.centerTextItem = QGraphicsTextItem()
         self.centerTextItem.setPos(self.width / 2 - self.fontSize, 0)
         self.centerTextItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.centerTextItem)
+
+        # timer item
+        self.timerTextItem = QGraphicsTextItem()
+        self.timerTextItem.setPos(self.width - self.fontSize, 0)
+        self.timerTextItem.setZValue(self.baseZValue + 1)
+        self.scene.addItem(self.timerTextItem)
+
         # center anchor item
         centerX = self.width / 2
         centerY = self.height / 2
@@ -296,9 +319,16 @@ class painter(QGraphicsView):
             return
         font = QFont()
         color = QColor()
+
         font.setPointSize(self.fontSize)
         font.setFamily("Microsoft YaHei")
         font.setLetterSpacing(QFont.AbsoluteSpacing, 0)
+
+        cneterFont = QFont()
+        cneterFont.setPointSize(self.cneterFontSize)
+        cneterFont.setFamily("Microsoft YaHei")
+        cneterFont.setLetterSpacing(QFont.AbsoluteSpacing, 0)
+
         index = 0
         lock.acquire()
         frame = hetaData.pop(0)
@@ -326,28 +356,32 @@ class painter(QGraphicsView):
                 )
                 index = index + 1
         self.cameraItem.setPixmap(self.cameraBuffer)
+
         # draw text
         p = QPainter(self.hetTextBuffer)
-        """
-        p.fillRect(
-                0, 0, self.width, 
-                self.height + self.textLineHeight, 
-                QBrush(QColor(Qt.white))
-            )
-        """
+
         hetDiff = maxHet - minHet
         bastNum = round(minHet)
         interval = round(hetDiff / 5)
 
-        """
-        for i in range(5):
-            hue = constrain(mapValue((bastNum + (i * interval)), minHet, maxHet, minHue, maxHue), minHue, maxHue)
-            color.setHsvF(hue / 360, 1.0, 1.0)
-            p.setPen(color)
-            p.setFont(font)
-            p.drawText(i * self.textInterval, self.fontSize + 3, str(bastNum + (i * interval)) + "°")
-        """
+        # Get temperature of center pixel
         cneter = round(frame[self.centerIndex], 1) + offset_temp
+
+        # Check if there is someone entering
+        if(sensorEnter.value >= required_distance):
+            self.start_timer = time()
+            self.timerStop = False
+            self.timer_counter = 3
+            self.temp_temperature = " "
+        else:
+            if((self.start_timer - time()) >= 1) and not self.timerStop:
+                self.start_timer = time()
+                self.timer_couner =- 1
+                if self.timer_counter == 0:
+                    self.temp_temperature = str(cneter)
+                    self.timerStop = True
+
+        # See if the temperature will allow the user to enter or not
         if(sensorEnter.value < required_distance):
             if(cneter > fever):
                 bgcolor = Qt.red
@@ -358,7 +392,8 @@ class painter(QGraphicsView):
         else:
             bgcolor = Qt.white
             textDisplay = "Go near entrance"
-            
+
+        # Logic for printing the background and text
         p.fillRect(
                 0, 0, self.width, 
                 self.height + self.textLineHeight, 
@@ -370,12 +405,21 @@ class painter(QGraphicsView):
         p.drawText(3, self.fontSize + 3, textDisplay)
         
         self.hetTextItem.setPixmap(self.hetTextBuffer)
+
+        # draw timer text item
+        timerText = "<font color=white>%s</font>"
+        self.timerTextItem.setFont(font)
+        self.timerTextItem.setHtml(timerText % (str(self.timer_counter)))
+
         # draw center het text
         centerText = "<font color=white>%s</font>"
-        self.centerTextItem.setFont(font)
-        self.centerTextItem.setHtml(centerText % (str(cneter) + "°"))
+        self.centerTextItem.setFont(cneterFont)
+        self.centerTextItem.setHtml(centerText % (str(self.temp_temperature) + "°"))
+
+        # Increase frame count then print to cmd line
         self.frameCount = self.frameCount + 1
         #print("picture->"+str(self.frameCount))
+
         # write in lcd
         temperature_print.setTemp(cneter)
     
