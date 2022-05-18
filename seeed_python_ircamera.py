@@ -378,7 +378,7 @@ class painter(QGraphicsView):
                 print(time())
                 print(self.timer_counter)
                 self.start_timer = time()
-                self.timer_couner =- 1
+                self.timer_counter =- 1
                 if self.timer_counter == 0:
                     self.temp_temperature = str(cneter)
                     self.timerStop = True
