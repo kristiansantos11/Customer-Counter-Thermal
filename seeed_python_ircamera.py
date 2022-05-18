@@ -524,12 +524,13 @@ def counter():
         if not previousBeepExit and beepExit:
             buzzer.beep(on_time = 0.3, n=1)
             previousBeepExit = True
+            count.decrement()
 
         if (exitDetected and (exitDistance > required_distance)):
             exitDetected = False
             beepExit = False
-            previousBeepActive = False
-            count.decrement()
+            previousBeepExit = False
+
 
         sleep(0.2)
 
