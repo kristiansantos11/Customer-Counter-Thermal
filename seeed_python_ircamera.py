@@ -380,7 +380,7 @@ class painter(QGraphicsView):
                 self.start_timer = time()
                 self.timer_counter -= 1
                 if self.timer_counter == 0:
-                    self.temp_temperature = str(cneter)
+                    self.temp_temperature = str(cneter) + "°"
                     self.timerStop = True
 
         # See if the temperature will allow the user to enter or not
@@ -416,7 +416,7 @@ class painter(QGraphicsView):
         # draw center het text
         centerText = "<font color=white>%s</font>"
         self.centerTextItem.setFont(cneterFont)
-        self.centerTextItem.setHtml(centerText % (str(self.temp_temperature) + "°"))
+        self.centerTextItem.setHtml(centerText % (str(self.temp_temperature)))
 
         # Increase frame count then print to cmd line
         self.frameCount = self.frameCount + 1
