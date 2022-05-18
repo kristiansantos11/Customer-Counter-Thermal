@@ -369,7 +369,6 @@ class painter(QGraphicsView):
 
         # Check if there is someone entering
         if(sensorEnter.value >= required_distance):
-            print(time())
             self.start_timer = time()
             self.timerStop = False
             self.timer_counter = 3
@@ -377,6 +376,7 @@ class painter(QGraphicsView):
         else:
             if((time() - self.start_timer) >= 1) and not self.timerStop:
                 print(time())
+                print(self.timer_counter)
                 self.start_timer = time()
                 self.timer_couner =- 1
                 if self.timer_counter == 0:
