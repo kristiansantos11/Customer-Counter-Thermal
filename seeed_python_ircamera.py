@@ -226,8 +226,10 @@ class painter(QGraphicsView):
     pixelSize = int(15 / narrowRatio)
     width = int (480 / narrowRatio)
     height = int(360 / narrowRatio)
-    fontSize = int(30 / narrowRatio)
-    cneterFontSize = int(30 / narrowRatio) + 5
+
+    fontSize = int(30 / narrowRatio) + 10
+    cneterFontSize = int(30 / narrowRatio) + 15
+
     anchorLineSize = int(100 / narrowRatio)
     ellipseRadius = int(8 / narrowRatio)
     textInterval = int(90 / narrowRatio)
@@ -262,13 +264,13 @@ class painter(QGraphicsView):
 
         # center het text item
         self.centerTextItem = QGraphicsTextItem()
-        self.centerTextItem.setPos(self.width / 2 - self.fontSize, 0)
+        self.centerTextItem.setPos(self.width / 2 - self.cneterFontSize, 0)
         self.centerTextItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.centerTextItem)
 
         # timer item
         self.timerTextItem = QGraphicsTextItem()
-        self.timerTextItem.setPos(self.width - self.fontSize, 0)
+        self.timerTextItem.setPos(self.width - self.fontSize - 10, 0)
         self.timerTextItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.timerTextItem)
 
