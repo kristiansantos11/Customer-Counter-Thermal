@@ -378,6 +378,8 @@ class painter(QGraphicsView):
             self.timer_counter = 3
             self.temp_temperature = " "
         else:
+            bgcolor = Qt.white
+            textDisplay = "Wait for timer to go 0"
             if((time() - self.start_timer) >= 1) and not self.timerStop:
                 print(time())
                 print(self.timer_counter)
