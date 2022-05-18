@@ -568,7 +568,7 @@ def counter():
                 buzzer.beep(on_time=3, n=1)
                 previousBeepFever = True
 
-            sleep(0.2)
+        sleep(0.2)
 
 def shutdown():
     check_call(['sudo','poweroff'])
