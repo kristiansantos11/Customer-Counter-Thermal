@@ -268,9 +268,15 @@ class painter(QGraphicsView):
         self.centerTextItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.centerTextItem)
 
+        # timer TEXT item
+        self.timerItem = QGraphicsTextItem()
+        self.timerItem.setPos(self.width - self.fontSize - 10, 0)
+        self.timerItem.setZValue(self.baseZValue + 1)
+        self.scene.addItem(self.timerItem)
+
         # timer item
         self.timerTextItem = QGraphicsTextItem()
-        self.timerTextItem.setPos(self.width - self.fontSize - 10, 0)
+        self.timerTextItem.setPos(self.width - self.fontSize - 10, self.fontSize + 10)
         self.timerTextItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.timerTextItem)
 
@@ -325,6 +331,11 @@ class painter(QGraphicsView):
         font.setPointSize(self.fontSize)
         font.setFamily("Microsoft YaHei")
         font.setLetterSpacing(QFont.AbsoluteSpacing, 0)
+
+        timerFont = QFont()
+        timerFont.setPointSize(self.cneterFontSize - 10)
+        timerFont.setFamily("Microsoft YaHei")
+        timerFont.setLetterSpacing(QFont.AbsoluteSpacing, 0)
 
         cneterFont = QFont()
         cneterFont.setPointSize(self.cneterFontSize)
@@ -411,6 +422,11 @@ class painter(QGraphicsView):
         p.drawText(3, self.fontSize + 3, textDisplay)
         
         self.hetTextItem.setPixmap(self.hetTextBuffer)
+
+        # draw timer text item
+        timerActualText = "<font color=white>%s</font>"
+        self.timerTextItem.setFont(timerFont)
+        self.timerTextItem.setHtml(timerActualText % "Timer:")
 
         # draw timer text item
         timerText = "<font color=white>%s</font>"
