@@ -389,7 +389,7 @@ class painter(QGraphicsView):
                     temperature_print.setTemp(cneter)
             if self.timerStop:
                 # See if the temperature will allow the user to enter or not
-                if (cneter > fever):
+                if (temperature_print.temperature > fever):
                     bgcolor = Qt.red
                     textDisplay = "Entrance denied."
                 else:
