@@ -425,8 +425,8 @@ class painter(QGraphicsView):
 
         # draw timer text item
         timerActualText = "<font color=white>%s</font>"
-        self.timerTextItem.setFont(timerFont)
-        self.timerTextItem.setHtml(timerActualText % "Timer:")
+        self.timerItem.setFont(timerFont)
+        self.timerItem.setHtml(timerActualText % "Timer:")
 
         # draw timer text item
         timerText = "<font color=white>%s</font>"
