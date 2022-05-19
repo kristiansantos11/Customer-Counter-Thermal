@@ -270,7 +270,7 @@ class painter(QGraphicsView):
 
         # timer TEXT item
         self.timerItem = QGraphicsTextItem()
-        self.timerItem.setPos(self.width - self.fontSize - 10, 0)
+        self.timerItem.setPos(self.width - self.fontSize - 30, 0)
         self.timerItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.timerItem)
 
@@ -333,7 +333,7 @@ class painter(QGraphicsView):
         font.setLetterSpacing(QFont.AbsoluteSpacing, 0)
 
         timerFont = QFont()
-        timerFont.setPointSize(self.cneterFontSize - 10)
+        timerFont.setPointSize(self.cneterFontSize - 40)
         timerFont.setFamily("Microsoft YaHei")
         timerFont.setLetterSpacing(QFont.AbsoluteSpacing, 0)
 
