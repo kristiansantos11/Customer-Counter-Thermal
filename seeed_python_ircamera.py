@@ -488,6 +488,7 @@ def counter():
     previousBeepFever = False
     beepExit = False
     previousBeepExit = False
+    beepFull = True
 
     start_time = time()
     timer_count = 3
@@ -524,12 +525,20 @@ def counter():
                 count.increment()
                 previousBeepActive = True
         else:
-            ledWarn.off()
             beepActive = False
             previousBeepActive = False
-            if not beepExit or not beepActive:
-                buzzer.off()
             ledEnter.off()
+
+        if not beepExit or not beepActive or not beepFull:
+            buzzer.off()
+            ledWarn.off()
+
+        if count.count >= 10:
+            beepFull = True
+            ledWarn.on()
+            buzzer.on()
+        else:
+            beepFull = False
 
 
         # Exit Logic
