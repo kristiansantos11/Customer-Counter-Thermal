@@ -527,11 +527,10 @@ def counter():
         else:
             beepActive = False
             previousBeepActive = False
+            if not beepExit or not beepActive or not beepFull:
+                buzzer.off()
+                ledWarn.off()
             ledEnter.off()
-
-        if not beepExit or not beepActive or not beepFull:
-            buzzer.off()
-            ledWarn.off()
 
         if count.count >= 10:
             beepFull = True
