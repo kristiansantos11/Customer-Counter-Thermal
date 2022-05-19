@@ -333,7 +333,7 @@ class painter(QGraphicsView):
         font.setLetterSpacing(QFont.AbsoluteSpacing, 0)
 
         timerFont = QFont()
-        timerFont.setPointSize(self.cneterFontSize - 40)
+        timerFont.setPointSize(self.cneterFontSize - 20)
         timerFont.setFamily("Microsoft YaHei")
         timerFont.setLetterSpacing(QFont.AbsoluteSpacing, 0)
 
