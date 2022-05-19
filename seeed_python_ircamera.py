@@ -270,13 +270,13 @@ class painter(QGraphicsView):
 
         # timer TEXT item
         self.timerItem = QGraphicsTextItem()
-        self.timerItem.setPos(self.width - self.fontSize - 60, 0)
+        self.timerItem.setPos(self.width - self.fontSize - 68, 0)
         self.timerItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.timerItem)
 
         # timer item
         self.timerTextItem = QGraphicsTextItem()
-        self.timerTextItem.setPos(self.width - self.fontSize - 10, self.fontSize + 10)
+        self.timerTextItem.setPos(self.width - self.fontSize - 15, self.fontSize + 10)
         self.timerTextItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.timerTextItem)
 
