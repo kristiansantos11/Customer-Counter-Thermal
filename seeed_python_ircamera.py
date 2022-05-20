@@ -264,7 +264,7 @@ class painter(QGraphicsView):
 
         # center het text item
         self.centerTextItem = QGraphicsTextItem()
-        self.centerTextItem.setPos(self.width / 2 - self.cneterFontSize - 30, 0)
+        self.centerTextItem.setPos(self.width / 2 - self.cneterFontSize - 37, 0)
         self.centerTextItem.setZValue(self.baseZValue + 1)
         self.scene.addItem(self.centerTextItem)
 
