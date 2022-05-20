@@ -514,6 +514,7 @@ def counter():
             if temperature_print.temperature > fever:
                 ledWarn.on()
                 buzzer.on()
+                beepActive = False
             else:
                 ledEnter.on()
                 beepActive = True
